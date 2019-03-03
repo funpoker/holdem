@@ -1,0 +1,130 @@
+// holdem.proto
+syntax = "proto3";
+package holdem;
+
+enum MessageType {
+    JOIN_GAME_REQUEST = 0;
+    JOIN_GAME_RESPONSE = 1;
+    PLAYER_INFO_NOTIFY = 2;
+
+    START_GAME_REQUEST = 3;
+
+    SEND_CARD = 4;
+
+    BET_REQUEST = 5;
+    BET_NOTIFY = 6;
+
+    RESULT_NOTIFY = 7;
+
+    EXIT_GAME_REQUEST = 8;
+    EXIT_GAME_NOTIFY = 9;
+
+    ERROR = 10;
+}
+
+enum CardType {
+    PLAYER = 0;
+    FLOP = 1;
+    TURN = 2;
+    RIVER = 3;
+}
+
+enum PlayerRole {
+    ACTOR = 0;
+    WATCHER = 1;
+}
+
+enum GameRole {
+    DEALER = 0;
+    SB = 1;  //small blind
+    BB = 2;  // big blind
+    UTG = 3; // under the gun
+    NORMAL = 4;
+}
+
+message Header {
+    MessageType type = 1;
+    int32 length = 2;
+    int32 check_sum = 3;
+    int32 room_id = 4;
+}
+
+// join game request
+message JoinGameRequest {
+    int32 player_id = 2;
+    PlayerRole role = 3;
+}
+
+message Player {
+    int32 id = 1;
+    string username = 2;
+    string avatar_url = 3;
+    int32 amount = 4;
+}
+
+// notify all related player before each round
+message PlayerInfoNotify {
+    Player player = 1;
+    PlayerRole role = 2;
+    GameRole game_role = 3;
+    int32 position = 4;
+}
+
+// reply all players in the same room
+message JoinGameResponse {
+    repeated PlayerInfoNotify players = 1;
+}
+
+message StartGameRequest {
+    int32 player_id = 1;
+}
+
+message SendCardNotify {
+    CardType card_type = 1;
+    int32 num = 2;
+    repeated string cards = 3;
+    string receiver = 4;
+}
+
+message BetRequest {
+    int32 player_id = 1;
+    int32 amount = 2;
+    bool check = 3;
+    bool drop = 4;
+}
+
+message Pot {
+    int32 player_id = 1;
+    int32 amount = 2;
+}
+
+message BetNotify {
+    BetRequest bet_request = 1;
+    repeated Pot pots = 2;  // all-in
+}
+
+message ResultNotify {
+    message PlayerInfo {
+        string username = 1;
+        int32 position = 2;
+        int32 amount = 3;
+        bool is_win = 4;
+        repeated string cards = 5;
+    }
+
+    repeated PlayerInfo active_players = 1;
+    repeated Pot pots = 2;  // winner -> amount
+}
+
+message ExitGameRequest {
+    Player player = 1;
+}
+
+message ExitGameNotify {
+    Player player = 1;
+}
+
+message Error {
+    int32 code = 1;
+    string message = 2;
+}
