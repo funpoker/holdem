@@ -1,32 +1,38 @@
 package models
 
-import "time"
+import (
+	"time"
+
+	"github.com/jinzhu/gorm"
+)
+
+const (
+	GameStatusEnd   = 0
+	GameStatusJoin  = 1
+	GameStatusStart = 2
+)
 
 type Room struct {
-	Id            uint64
+	gorm.Model
 	Name          string
 	BackgroundUrl string
-	CreatedTime   time.Time
-	UpdatedTime   time.Time
 	Status        int
 }
 
 type Player struct {
-	Id          uint64
-	Username    string
-	Password    string
-	AvatarUrl   string
-	chip        uint64
-	CreatedTime time.Time
-	UpdatedTime time.Time
-	Status      int
+	gorm.Model
+	Username  string
+	Password  string
+	AvatarUrl string
+	chip      uint
+	Status    int
 }
 
 type Game struct {
-	Id        uint64
-	RoomId    uint64
-	Period    uint64
-	Round     uint64
+	gorm.Model
+	RoomId    uint
+	Period    uint
+	Round     uint
 	Flop      string
 	Turn      string
 	River     string
@@ -36,23 +42,20 @@ type Game struct {
 }
 
 type RelationGamePlayer struct {
-	Id             uint64
-	GameId         uint64
-	PlayerId       uint64
+	gorm.Model
+	GameId         uint
+	PlayerId       uint
 	PlayerRole     int
 	PlayerPosition int
 	Hands          string
-	CreatedTime    time.Time
-	UpdatedTime    time.Time
-	Status         int
+	Status         int // 0 end, 1 join, 2 start
 }
 
 type GameRecord struct {
-	Id          uint64
-	GameId      uint64
-	PlayerId    uint64
-	Round       uint64
-	Phase       int
-	Amount      uint64
-	CreatedTime time.Time
+	gorm.Model
+	GameId   uint
+	PlayerId uint
+	Round    uint
+	Phase    int
+	Amount   uint
 }
